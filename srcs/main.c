@@ -1,18 +1,19 @@
 #include "nm.h"
+	#include <stdio.h>
 
 void print_output(int nsyms, int sysmoff, int stroff, char *ptr)
 {
 	int i;
 	char *stringtable;
-	struct nlist_64 *el;
+	struct nlist_64 *array;
 
-	array = (void *)ptr + symoff;
+	array = (void *)ptr + sysmoff;
 	stringtable = (void *)ptr + stroff;
 
 	i = 0;
 	while(i < nsyms)
 	{
-		printf("%s\n", stringtable + array[i].n_um.n_strx);
+		printf("%s\n", stringtable + array[i].n_un.n_strx);
 		i++;
 	}
 }
@@ -21,8 +22,8 @@ void bin_64(char *ptr)
 {
 	int ncmds;
 	int i;
-	struct mach_header *header;
-	struct load_command *ls;
+	struct mach_header_64 *header;
+	struct load_command *lc;
 	struct symtab_command *sym;
 
 	header = (struct mach_header_64 *)ptr;
@@ -31,10 +32,10 @@ void bin_64(char *ptr)
 	lc = (void*)ptr + sizeof(*header);
 	while(i < ncmds)
 	{
-		if(lc->cmd == LC_SYSTAB)
+		if(lc->cmd == LC_SYMTAB)
 		{
-			sym = (struct symrab_command *);
-			print_output(sym->msyms, sym->symoff, sym->stroff, ptr);
+			sym = (struct symtab_command *) lc;
+			print_output(sym->nsyms, sym->symoff, sym->stroff, ptr);
 			break;
 		}
 		lc = (void *)lc + lc->cmdsize;
@@ -49,8 +50,8 @@ void nm(char *ptr)
 	int magic_number;
 
 	magic_number = *(int *) ptr;
-	if(magic_number = MH_MAGIC_64)
-		bin_64();	
+	if((unsigned int)magic_number == MH_MAGIC_64)
+		bin_64(ptr);	
 }
 
 int main(int argc, char **argv)
@@ -58,7 +59,7 @@ int main(int argc, char **argv)
 	int 	fd;
 	char	*ptr;
 	struct stat buf;
-	int i = 0;
+	int i = 1;
 
 	if(argc < 2)
 	{
