@@ -1,6 +1,6 @@
 NAME = ft_nm
 
-SRC = srcs/main.c
+SRC = srcs/main.c srcs/bin_64_revers.c srcs/bin_32_revers.c srcs/lib.c srcs/bin_32.c srcs/bin_64.c  srcs/fat_32.c
 
 FLAGS = -Wall -Wextra -Werror
 

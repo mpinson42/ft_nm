@@ -1,57 +1,51 @@
 #include "nm.h"
-	#include <stdio.h>
 
-void print_output(int nsyms, int sysmoff, int stroff, char *ptr)
+int nm(char *ptr, unsigned long long int size)
 {
-	int i;
-	char *stringtable;
-	struct nlist_64 *array;
+	unsigned int magic_number;
+	t_gen g;
 
-	array = (void *)ptr + sysmoff;
-	stringtable = (void *)ptr + stroff;
-
-	i = 0;
-	while(i < nsyms)
-	{
-		printf("%s\n", stringtable + array[i].n_un.n_strx);
-		i++;
-	}
-}
-
-void bin_64(char *ptr)
-{
-	int ncmds;
-	int i;
-	struct mach_header_64 *header;
-	struct load_command *lc;
-	struct symtab_command *sym;
-
-	header = (struct mach_header_64 *)ptr;
-	ncmds = header->ncmds;
-	i = 0;
-	lc = (void*)ptr + sizeof(*header);
-	while(i < ncmds)
-	{
-		if(lc->cmd == LC_SYMTAB)
-		{
-			sym = (struct symtab_command *) lc;
-			print_output(sym->nsyms, sym->symoff, sym->stroff, ptr);
-			break;
-		}
-		lc = (void *)lc + lc->cmdsize;
-		i++;
-	}
-
-
-}
-
-void nm(char *ptr)
-{
-	int magic_number;
-
-	magic_number = *(int *) ptr;
+	g.ptr = ptr;
+	g.end_ptr = ptr + size;
+	magic_number = *(unsigned int *) ptr;
+	g.is_32 = 0;
 	if((unsigned int)magic_number == MH_MAGIC_64)
-		bin_64(ptr);	
+	{
+		bin_64(&g);
+	}
+	else if((unsigned int)magic_number == MH_MAGIC)
+	{
+		g.is_32 = 1;
+		bin_32(&g);
+	}
+	else if((unsigned int)magic_number == MH_CIGAM_64)
+	{
+		bin_64_revers(&g);
+	}
+	else if((unsigned int)magic_number == MH_CIGAM)
+	{
+		g.is_32 = 1;
+		bin_32_revers(&g);
+		//bin_64_revers(ptr);
+	}
+
+	else if((unsigned int)magic_number == FAT_MAGIC)
+	{
+		fat_32(&g);
+	}
+	else if((unsigned int)magic_number == FAT_MAGIC_64)
+	{
+		fat_64(&g);
+	}
+	else if((unsigned int)magic_number == FAT_CIGAM)
+	{
+		fat_32_revers(&g);
+	}
+	else if((unsigned int)magic_number == FAT_CIGAM_64)
+	{
+		fat_64_revers(&g);
+	}
+	return (0);
 }
 
 int main(int argc, char **argv)
@@ -84,7 +78,8 @@ int main(int argc, char **argv)
 			ft_putendl("error");
 			return(-1);
 		}
-		nm(ptr);
+		if(nm(ptr, buf.st_size) == -1)
+			return(-1);
 		if(munmap(ptr, buf.st_size) < 0)
 		{
 			ft_putendl("error");
