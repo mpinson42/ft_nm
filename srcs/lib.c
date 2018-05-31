@@ -52,9 +52,33 @@ uint64_t revers_uint64(uint64_t n)
 			| (n & 0x00000000000000ff) << 56);
 }
 
+char ft_char(t_gen *g, long long int val)
+{
+	int t = N_TYPE & g->type;
+	char c;
+	(void)t;
+
+	c = '?';
+	if(N_STAB & g->type)
+		c= '-';
+	else if(t == N_UNDF)
+		c = val ? 'c' : 'u';
+	else if(t == N_ABS)
+		c = 'a';
+	else if(t == N_PBUD)
+		c = 'u';
+	else if(t == N_INDR)
+		c = 'i';
+	else if(t == N_WEAK_REF)
+		c = 'W';
+	return(c);
+}
+
 void print_nm(long long int add, int type, char *str, t_gen *g)
 {
 	char *nb = unsigned_itoa_base(add, 16);
+	char c = ft_char(g, add);
+	(void)type;
 	if(str[0] == 0)
 		return;
 	//printf("%s\n", unsigned_itoa_base(add, 16));
@@ -84,7 +108,7 @@ void print_nm(long long int add, int type, char *str, t_gen *g)
 			ft_putstr("                ");
 	}
 	ft_putchar(' ');
-	ft_putnbr(type);
+	ft_putchar(c);
 	ft_putchar(' ');
 	ft_putstr(str);
 	//if(add != 0)
