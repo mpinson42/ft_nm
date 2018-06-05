@@ -34,15 +34,15 @@ int			otools_64(t_gen *g)
 					char *str = unsigned_itoa_base(section[i].addr,16);
 					uint8_t *c = (void*)g->ptr + section[i].offset;
 
-					int size = 0;
+					int size = 1;
 					while(size < section[i].size)
 					{
-						str = unsigned_itoa_base(c[size],16);
+						str = unsigned_itoa_base(c[size-1],16);
 						if(ft_strlen(str) == 1)
 							ft_putstr("0");
 						ft_putstr(str);
 						ft_putstr(" ");
-						if(size % 16 == 0 && size != 0)
+						if(size % 16 == 0 )
 							ft_putstr("\n");
 						size++;
 					}
