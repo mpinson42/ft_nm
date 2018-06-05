@@ -52,6 +52,24 @@ uint64_t revers_uint64(uint64_t n)
 			| (n & 0x00000000000000ff) << 56);
 }
 
+char ft_section(t_gen *g, long long int val)
+{
+	(void)g;
+	(void)val;
+	int i = 0;
+	while(g->name_section[i])
+		i++;
+	if(i < g->sect)
+		return '?';
+	if(ft_strncmp(g->name_section[g->sect - 1], "__text", 6) == 0)
+		return 't';
+	else if(ft_strncmp(g->name_section[g->sect - 1], "__data", 6) == 0)
+		return 'd';
+	else if(ft_strncmp(g->name_section[g->sect - 1], "__bss", 5) == 0)
+		return 'b';
+	return 's';
+}
+
 char ft_char(t_gen *g, long long int val)
 {
 	int t = N_TYPE & g->type;
@@ -71,6 +89,11 @@ char ft_char(t_gen *g, long long int val)
 		c = 'i';
 	else if(t == N_WEAK_REF)
 		c = 'W';
+	else if (t == N_SECT)
+		c = ft_section(g, val);
+
+	if(N_EXT & g->type)
+		c = ft_toupper(c);
 	return(c);
 }
 
@@ -79,8 +102,8 @@ void print_nm(long long int add, int type, char *str, t_gen *g)
 	char *nb = unsigned_itoa_base(add, 16);
 	char c = ft_char(g, add);
 	(void)type;
-	if(str[0] == 0)
-		return;
+//	if(str[0] == 0)
+//		return;
 	//printf("%s\n", unsigned_itoa_base(add, 16));
 	int i = 0;
 	if(g->is_32)

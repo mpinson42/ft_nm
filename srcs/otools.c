@@ -1,6 +1,6 @@
 #include "nm.h"
 
-int nm(char *ptr, unsigned long long int size, char*argv, int argc)
+int otool(char *ptr, unsigned long long int size, char*argv, int argc)
 {
 	unsigned int magic_number;
 	t_gen g;
@@ -13,9 +13,9 @@ int nm(char *ptr, unsigned long long int size, char*argv, int argc)
 	g.is_32 = 0;
 	if((unsigned int)magic_number == MH_MAGIC_64)
 	{
-		bin_64(&g);
+		otools_64(&g);
 	}
-	else if((unsigned int)magic_number == MH_MAGIC)
+/*	else if((unsigned int)magic_number == MH_MAGIC)
 	{
 		g.is_32 = 1;
 		bin_32(&g);
@@ -46,7 +46,7 @@ int nm(char *ptr, unsigned long long int size, char*argv, int argc)
 	else if((unsigned int)magic_number == FAT_CIGAM_64)
 	{
 		fat_64_revers(&g);
-	}
+	}*/
 	return (0);
 }
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 			ft_putendl("error");
 			return(-1);
 		}
-		if(nm(ptr, buf.st_size, argv[i], argc) == -1)
+		if(otool(ptr, buf.st_size, argv[i], argc) == -1)
 			return(-1);
 		if(munmap(ptr, buf.st_size) < 0)
 		{

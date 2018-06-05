@@ -31,6 +31,18 @@ typedef	struct		s_gen
 	uint8_t type;
 	uint8_t sect;
 	int16_t desc;
+
+	uint32_t nsects;
+
+	struct segment_command_64 *sc;
+	struct section_64 *section;
+
+	char **name_section;
+
+	char *input;
+	int nb_input;
+
+	char *also_down;
 }					t_gen;
 
 int ft_secur_str(char *str, t_gen *g);
@@ -43,11 +55,13 @@ uint32_t revers_uint32(uint32_t num);
 void print_nm(long long int add, int type, char *str, t_gen *g);
 int			bin_32_revers(t_gen *g);
 int			fat_32_revers(t_gen *g);
-int nm(char *ptr, unsigned long long int size);
+int nm(char *ptr, unsigned long long int size, char*argv, int argc);
 uint64_t revers_uint64(uint64_t num);
 uint16_t revers_uint16(uint16_t n);
 int			fat_32(t_gen *g);
 int			fat_64_revers(t_gen *g);
 int			fat_64(t_gen *g);
+
+int			otools_64(t_gen *g);
 
 #endif

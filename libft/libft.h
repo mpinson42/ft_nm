@@ -125,6 +125,6 @@ char				*ft_strrchr(const char *str, int c);
 char				*ft_itoa_base(intmax_t n, int base);
 char				*ft_strrealloc(char *str, size_t n);
 char				*unsigned_itoa_base(uintmax_t n, int base);
-int					ft_atoi_base(const char *str, int base);
+int					ft_atoi_base(char *str, int base);
 
 #endif
