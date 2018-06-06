@@ -51,7 +51,7 @@ int			otool_fat_32_revers(t_gen *g)
 		//	nm((void*)g->ptr + revers_uint32(fat_arch[i].offset), revers_uint32(fat_arch[i].size));
 		i++;
 	}
-	otool((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g->nb_input);
+	otool((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g);
 	return(0);
 }
 
@@ -78,7 +78,7 @@ int			otool_fat_64_revers(t_gen *g)
 				save = i;
 		i++;
 	}
-	otool((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g->nb_input);
+	otool((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g);
 	return(0);
 }
 
@@ -105,7 +105,7 @@ int			otool_fat_64(t_gen *g)
 				save = i;
 		i++;
 	}
-	otool((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g->nb_input);
+	otool((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g);
 	return(0);
 }
 
@@ -132,6 +132,6 @@ int			otool_fat_32(t_gen *g)
 				save = i;
 		i++;
 	}
-	otool((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g->nb_input);
+	otool((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g);
 	return(0);
 }

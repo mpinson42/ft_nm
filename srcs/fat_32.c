@@ -51,7 +51,7 @@ int			fat_32_revers(t_gen *g)
 		//	nm((void*)g->ptr + revers_uint32(fat_arch[i].offset), revers_uint32(fat_arch[i].size));
 		i++;
 	}
-	nm((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g->nb_input);
+	nm((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g);
 	return(0);
 }
 
@@ -79,7 +79,7 @@ int			fat_64_revers(t_gen *g)
 		//	nm((void*)g->ptr + revers_uint32(fat_arch[i].offset), revers_uint32(fat_arch[i].size));
 		i++;
 	}
-	nm((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g->nb_input);
+	nm((void*)g->ptr + revers_uint32(fat_arch[save].offset), revers_uint32(fat_arch[save].size), g->input, g);
 	return(0);
 }
 
@@ -107,7 +107,7 @@ int			fat_64(t_gen *g)
 		//	nm((void*)g->ptr + revers_uint32(fat_arch[i].offset), revers_uint32(fat_arch[i].size));
 		i++;
 	}
-	nm((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g->nb_input);
+	nm((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g);
 	return(0);
 }
 
@@ -135,6 +135,6 @@ int			fat_32(t_gen *g)
 		//	nm((void*)g->ptr + revers_uint32(fat_arch[i].offset), revers_uint32(fat_arch[i].size));
 		i++;
 	}
-	nm((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g->nb_input);
+	nm((void*)g->ptr + fat_arch[save].offset, fat_arch[save].size, g->input, g);
 	return(0);
 }

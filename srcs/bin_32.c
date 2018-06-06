@@ -48,6 +48,44 @@ char		**sort_name_32(struct nlist *array,
 	return (val1);
 }
 
+char		**revers_sort_32(struct nlist *array,int max, char *str, t_gen *g)
+{
+	int		is_sort;
+	int		i;
+	char	**val1;
+	int		y;
+
+	if (!(val1 = ft_test_error(str, array, max, g)))
+		return (NULL);
+	is_sort = 1;
+	while (is_sort)
+	{
+		i = -1;
+		is_sort = 0;
+		while (++i + 1 < max)
+		{
+			y = 0;
+			while (val1[i][y] != 0 && val1[i][y] == val1[i + 1][y])
+				y++;
+			if (val1[i][y] < val1[i + 1][y])
+			{
+				is_sort = 1;
+				ft_swap(&val1[i + 1], &val1[i]);
+			}
+		}
+	}
+	return (val1);
+}
+
+char **deflault_sort_32(struct nlist *array,int max, char *str, t_gen *g)
+{
+	char	**val1;
+
+	if (!(val1 = ft_test_error(str, array, max, g)))
+		return (NULL);
+	return (val1);
+}
+
 int			print_output_32(int nsyms, int sysmoff, int stroff, t_gen *g)
 {
 	int				y;
@@ -60,8 +98,17 @@ int			print_output_32(int nsyms, int sysmoff, int stroff, t_gen *g)
 		return (-1);
 	array = (void *)g->ptr + sysmoff;
 	stringtable = (void *)g->ptr + stroff;
-	if (!(str = sort_name_32(array, nsyms, stringtable, g)))
-		return (-1);
+	if(g->flag_p == 0 && g->flag_r == 0)
+	{
+		if (!(str = sort_name_32(array, nsyms, stringtable, g)))
+			return (-1);
+	}
+	else if(g->flag_r == 1)
+	{
+		str = revers_sort_32(array, nsyms, stringtable, g);
+	}
+	else
+		str = deflault_sort_32(array, nsyms, stringtable, g);
 	g->i = -1;
 	while (++g->i < nsyms)
 	{
@@ -155,6 +202,12 @@ int			bin_32(t_gen *g)
 		if (g->lc->cmd == LC_SYMTAB)
 		{
 			g->sym = (struct symtab_command *)g->lc;
+			if(g->nb_input - g->count_flag != 2 && g->flag_o == 0)
+			{
+				ft_putstr("\n");
+				ft_putstr(g->input);
+				ft_putstr(":\n");
+			}
 			if (print_output_32(g->sym->nsyms,
 				g->sym->symoff, g->sym->stroff, g) == -1)
 				return (-1);

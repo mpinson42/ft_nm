@@ -48,6 +48,10 @@ typedef	struct		s_gen
 	char *also_down;
 
 	int flag_d;
+	int flag_p;
+	int flag_o;
+	int flag_r;
+	int count_flag;
 }					t_gen;
 
 int ft_secur_str(char *str, t_gen *g);
@@ -60,7 +64,7 @@ uint32_t revers_uint32(uint32_t num);
 void print_nm(long long int add, int type, char *str, t_gen *g);
 int			bin_32_revers(t_gen *g);
 int			fat_32_revers(t_gen *g);
-int nm(char *ptr, unsigned long long int size, char*argv, int argc);
+int nm(char *ptr, unsigned long long int size, char*argv, t_gen *g);
 uint64_t revers_uint64(uint64_t num);
 uint16_t revers_uint16(uint16_t n);
 int			fat_32(t_gen *g);
@@ -74,6 +78,6 @@ int			otool_fat_32_revers(t_gen *g);
 int			otool_fat_64_revers(t_gen *g);
 int			otool_fat_64(t_gen *g);
 int			otool_fat_32(t_gen *g);
-int otool(char *ptr, unsigned long long int size, char*argv, int argc);
+int otool(char *ptr, unsigned long long int size, char*argv, t_gen *g);
 
 #endif

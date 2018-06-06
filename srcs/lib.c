@@ -109,6 +109,11 @@ void print_nm(long long int add, int type, char *str, t_gen *g)
 //		return;
 	//printf("%s\n", unsigned_itoa_base(add, 16));
 	int i = 0;
+	if(g->flag_o == 1)
+	{
+		ft_putstr(g->input);
+		ft_putstr(": ");
+	}
 	if(g->is_32)
 	{
 		while(c != 'U' && ft_strlen(nb) + i < 8)
