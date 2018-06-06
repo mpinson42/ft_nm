@@ -102,30 +102,33 @@ void print_nm(long long int add, int type, char *str, t_gen *g)
 	char *nb = unsigned_itoa_base(add, 16);
 	char c = ft_char(g, add);
 	(void)type;
+
+	if(c == '-' || c == '?' )
+		return;
 //	if(str[0] == 0)
 //		return;
 	//printf("%s\n", unsigned_itoa_base(add, 16));
 	int i = 0;
 	if(g->is_32)
 	{
-		while(add != 0 && ft_strlen(nb) + i < 8)
+		while(c != 'U' && ft_strlen(nb) + i < 8)
 		{
 			ft_putchar('0');
 			i++;
 		}
-		if(add != 0)
+		if(c != 'U')
 			ft_putstr(nb);
 		else
 			ft_putstr("        ");
 	}
 	else
 	{
-		while(add != 0 && ft_strlen(nb) + i < 16)
+		while(c != 'U' && ft_strlen(nb) + i < 16)
 		{
 			ft_putchar('0');
 			i++;
 		}
-		if(add != 0)
+		if(c != 'U')
 			ft_putstr(nb);
 		else
 			ft_putstr("                ");

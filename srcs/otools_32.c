@@ -1,31 +1,31 @@
 #include "nm.h"
 
-int			otools_64(t_gen *g)
+int			otools_32(t_gen *g)
 {
 	uint32_t nsects;
 	uint32_t i;
-	struct section_64 *section;
+	struct section *section;
 
-	g->header_64 = (struct mach_header_64 *)g->ptr;
-	g->ncmds = g->header_64->ncmds;
+	g->header_32 = (struct mach_header *)g->ptr;
+	g->ncmds = g->header_32->ncmds;
 	g->i = 0;
-	if (g->ptr + sizeof(*g->header_64) > g->end_ptr ||
-		g->ptr + sizeof(*g->header_64) < g->ptr)
+	if (g->ptr + sizeof(*g->header_32) > g->end_ptr ||
+		g->ptr + sizeof(*g->header_32) < g->ptr)
 		return (-1);
-	g->lc = (void*)g->ptr + sizeof(*g->header_64);
+	g->lc = (void*)g->ptr + sizeof(*g->header_32);
 
 
 	g->i = 0;
-	g->sc = (struct segment_command_64 *)g->lc;
+	g->sc_32 = (struct segment_command *)g->lc;
 	i = 0;
 	while (g->i < g->ncmds)
 	{
-		if (g->lc->cmd == LC_SEGMENT_64)
+		if (g->lc->cmd == LC_SEGMENT)
 		{
-			g->sc = (struct segment_command_64 *)g->lc;
-			nsects = g->sc->nsects;
+			g->sc_32 = (struct segment_command *)g->lc;
+			nsects = g->sc_32->nsects;
 			i = 0;
-			section = (struct section_64*)&g->sc[1];
+			section = (struct section*)&g->sc_32[1];
 			while(i < nsects)
 			{
 				if((char *)&section[i] < g->ptr || (char*)&section[i] > g->end_ptr)
@@ -33,7 +33,7 @@ int			otools_64(t_gen *g)
 				if(ft_strncmp(section[i].sectname,"__text",6)==0 && ft_strncmp(section[i].segname,"__TEXT",6)==0)
 				{
 					char *add;
-					uint64_t off = section[i].addr;
+					uint32_t off = section[i].addr;
 					uint8_t *c = (void*)g->ptr + section[i].offset;
 					int add_0 = 0;
 
@@ -42,7 +42,7 @@ int			otools_64(t_gen *g)
 					ft_putstr(g->input);
 					ft_putstr(":\nContents of (__TEXT,__text) section\n");
 					add = unsigned_itoa_base(off, 16);
-					while(add_0 + ft_strlen(add) < 16)
+					while(add_0 + ft_strlen(add) < 8)
 					{
 						ft_putstr("0");
 						add_0++;
@@ -62,7 +62,7 @@ int			otools_64(t_gen *g)
 							ft_putstr("\n");
 							add = unsigned_itoa_base(off, 16);
 							add_0 = 0;
-							while(add_0 + ft_strlen(add) < 16)
+							while(add_0 + ft_strlen(add) < 8)
 							{
 								ft_putstr("0");
 								add_0++;

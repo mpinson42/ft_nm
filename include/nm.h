@@ -37,12 +37,17 @@ typedef	struct		s_gen
 	struct segment_command_64 *sc;
 	struct section_64 *section;
 
+	struct segment_command *sc_32;
+	struct section *section_32;
+
 	char **name_section;
 
 	char *input;
 	int nb_input;
 
 	char *also_down;
+
+	int flag_d;
 }					t_gen;
 
 int ft_secur_str(char *str, t_gen *g);
@@ -63,5 +68,12 @@ int			fat_64_revers(t_gen *g);
 int			fat_64(t_gen *g);
 
 int			otools_64(t_gen *g);
+int			otools_32(t_gen *g);
+
+int			otool_fat_32_revers(t_gen *g);
+int			otool_fat_64_revers(t_gen *g);
+int			otool_fat_64(t_gen *g);
+int			otool_fat_32(t_gen *g);
+int otool(char *ptr, unsigned long long int size, char*argv, int argc);
 
 #endif

@@ -83,12 +83,72 @@ int			print_output_32(int nsyms, int sysmoff, int stroff, t_gen *g)
 
 int			bin_32(t_gen *g)
 {
+	uint32_t nsects;
+	uint32_t i;
+	struct section *section_32;
 	g->header_32 = (struct mach_header *)g->ptr;
 	g->ncmds = g->header_32->ncmds;
 	g->i = 0;
 	if (g->ptr + sizeof(*g->header_32) > g->end_ptr ||
 		g->ptr + sizeof(*g->header_32) < g->ptr)
 		return (-1);
+
+	g->lc = (void*)g->ptr + sizeof(*g->header_32);
+
+
+	g->i = 0;
+	g->sc_32 = (struct segment_command *)g->lc;
+	i = 0;
+	while (g->i < g->ncmds)
+	{
+		if (g->lc->cmd == LC_SEGMENT)
+		{
+			g->sc_32 = (struct segment_command *)g->lc;
+			nsects = g->sc_32->nsects;
+
+
+			section_32 = (void*)&g->sc_32[1];
+			i += nsects;
+		}
+		if ((char*)g->lc + g->lc->cmdsize > g->end_ptr ||
+			(char*)g->lc + g->lc->cmdsize < g->ptr)
+			return (-1);
+		g->lc = (void *)g->lc + g->lc->cmdsize;
+		g->i++;
+	}
+	g->name_section = malloc(sizeof(char *) * (i + 1));
+
+	g->lc = (void*)g->ptr + sizeof(*g->header_32);
+	g->i = 0;
+	g->sc_32 = (struct segment_command *)g->lc;
+	int test = 0;
+	while (g->i < g->ncmds)
+	{
+		if (g->lc->cmd == LC_SEGMENT)
+		{
+			g->sc_32 = (struct segment_command *)g->lc;
+			nsects = g->sc_32->nsects;
+
+			i = 0;
+			section_32 = (struct section*)&g->sc_32[1];
+			while(i < nsects)
+			{
+				g->name_section[test] = section_32[i].sectname;
+				section_32 = (void*)section_32;
+				i++;
+				test++;
+			}
+			
+		}
+		if ((char*)g->lc + g->lc->cmdsize > g->end_ptr ||
+			(char*)g->lc + g->lc->cmdsize < g->ptr)
+			return (-1);
+		g->lc = (void *)g->lc + g->lc->cmdsize;
+		g->i++;
+	}
+
+
+	g->i = 0;
 	g->lc = (void*)g->ptr + sizeof(*g->header_32);
 	while (g->i < g->ncmds)
 	{

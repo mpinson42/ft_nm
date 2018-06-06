@@ -15,12 +15,12 @@ int otool(char *ptr, unsigned long long int size, char*argv, int argc)
 	{
 		otools_64(&g);
 	}
-/*	else if((unsigned int)magic_number == MH_MAGIC)
+	else if((unsigned int)magic_number == MH_MAGIC)
 	{
 		g.is_32 = 1;
-		bin_32(&g);
+		otools_32(&g);
 	}
-	else if((unsigned int)magic_number == MH_CIGAM_64)
+/*	else if((unsigned int)magic_number == MH_CIGAM_64)
 	{
 		bin_64_revers(&g);
 	}
@@ -29,24 +29,24 @@ int otool(char *ptr, unsigned long long int size, char*argv, int argc)
 		g.is_32 = 1;
 		bin_32_revers(&g);
 		//bin_64_revers(ptr);
-	}
+	}*/
 
 	else if((unsigned int)magic_number == FAT_MAGIC)
 	{
-		fat_32(&g);
+		otool_fat_32(&g);
 	}
 	else if((unsigned int)magic_number == FAT_MAGIC_64)
 	{
-		fat_64(&g);
+		otool_fat_64(&g);
 	}
 	else if((unsigned int)magic_number == FAT_CIGAM)
 	{
-		fat_32_revers(&g);
+		otool_fat_32_revers(&g);
 	}
 	else if((unsigned int)magic_number == FAT_CIGAM_64)
 	{
-		fat_64_revers(&g);
-	}*/
+		otool_fat_64_revers(&g);
+	}
 	return (0);
 }
 

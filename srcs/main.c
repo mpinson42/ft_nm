@@ -20,8 +20,9 @@ int nm(char *ptr, unsigned long long int size, char*argv, int argc)
 		g.is_32 = 1;
 		bin_32(&g);
 	}
-	else if((unsigned int)magic_number == MH_CIGAM_64)
+/*	else if((unsigned int)magic_number == MH_CIGAM_64)
 	{
+		printf("test\n");
 		bin_64_revers(&g);
 	}
 	else if((unsigned int)magic_number == MH_CIGAM)
@@ -29,7 +30,8 @@ int nm(char *ptr, unsigned long long int size, char*argv, int argc)
 		g.is_32 = 1;
 		bin_32_revers(&g);
 		//bin_64_revers(ptr);
-	}
+	}*/
+
 
 	else if((unsigned int)magic_number == FAT_MAGIC)
 	{
