@@ -14,7 +14,7 @@ static int verif(char *ptr_)
 		prefer = 2;
 		return(1);
 	}
-	else if(prefer < 4 && *(unsigned int *)ptr_ == MH_CIGAM_64)
+/*	else if(prefer < 4 && *(unsigned int *)ptr_ == MH_CIGAM_64)
 	{
 		prefer = 4;
 		return(1);
@@ -23,7 +23,7 @@ static int verif(char *ptr_)
 	{
 		prefer = 1;
 		return(1);
-	}
+	}*/
 	return(-1);
 }
 
