@@ -1,10 +1,97 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   otools_64.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mpinson <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/06/10 12:28:33 by mpinson           #+#    #+#             */
+/*   Updated: 2018/06/10 12:28:34 by mpinson          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "nm.h"
 
-int			otools_64(t_gen *g)
+void	otools_64_printing2(t_algo *a)
 {
-	uint32_t nsects;
-	uint32_t i;
-	struct section_64 *section;
+	while (a->size <= a->section_64[a->i].size)
+	{
+		a->str = unsigned_itoa_base(a->c[a->size - 1], 16);
+		if (ft_strlen(a->str) == 1)
+			ft_putstr("0");
+		ft_putstr(a->str);
+		ft_putstr(" ");
+		if (a->size % 16 == 0)
+		{
+			a->off += 16;
+			ft_putstr("\n");
+			a->add = unsigned_itoa_base(a->off, 16);
+			a->add_0 = 0;
+			while (a->add_0 + ft_strlen(a->add) < 8)
+			{
+				ft_putstr("0");
+				a->add_0++;
+			}
+			ft_putstr(a->add);
+			ft_putstr("\t");
+			free(a->add);
+		}
+		free(a->str);
+		a->size++;
+	}
+}
+
+void	otools_64_printing1(t_algo *a, t_gen *g)
+{
+	a->off = a->section_64[a->i].addr;
+	a->c = (void*)g->ptr + a->section_64[a->i].offset;
+	a->add_0 = 0;
+	a->size = 1;
+	ft_putstr(g->input);
+	ft_putstr(":\nContents of (__DATA,__data) section\n");
+	a->add = unsigned_itoa_base(a->off, 16);
+	while (a->add_0 + ft_strlen(a->add) < 8)
+	{
+		ft_putstr("0");
+		a->add_0++;
+	}
+	ft_putstr(a->add);
+	ft_putstr("\t");
+	free(a->add);
+}
+
+int		otools_64_trouver(t_algo *a, t_gen *g)
+{
+	a->nsects = g->sc->nsects;
+	a->i = 0;
+	a->section_64 = (struct section*)&g->sc[1];
+	while (a->i < a->nsects)
+	{
+		if ((char *)&a->section_64[a->i] < g->ptr ||
+			(char*)&a->section_64[a->i] > g->end_ptr)
+			return (-1);
+		if (g->flag_d == 0 && ft_strncmp(a->section_64[a->i].sectname,
+			"__text", 6) == 0 && ft_strncmp(
+			a->section_64[a->i].segname, "__TEXT", 6) == 0)
+		{
+			otools_64_printing1(a, g);
+			otools_64_printing2(a);
+		}
+		else if (g->flag_d == 1 && ft_strncmp(a->section_64[a->i].sectname,
+			"__data", 6) == 0 && ft_strncmp(a->section_64[a->i].segname,
+			"__DATA", 6) == 0)
+		{
+			otools_64_printing1(a, g);
+			otools_64_printing2(a);
+		}
+		a->i++;
+	}
+	return (0);
+}
+
+int		otools_64(t_gen *g)
+{
+	t_algo a;
 
 	g->header_64 = (struct mach_header_64 *)g->ptr;
 	g->ncmds = g->header_64->ncmds;
@@ -13,112 +100,14 @@ int			otools_64(t_gen *g)
 		g->ptr + sizeof(*g->header_64) < g->ptr)
 		return (-1);
 	g->lc = (void*)g->ptr + sizeof(*g->header_64);
-
-
 	g->i = 0;
 	g->sc = (struct segment_command_64 *)g->lc;
-	i = 0;
+	a.i = 0;
 	while (g->i < g->ncmds)
 	{
-		if (g->lc->cmd == LC_SEGMENT_64)
-		{
-			g->sc = (struct segment_command_64 *)g->lc;
-			nsects = g->sc->nsects;
-			i = 0;
-			section = (struct section_64*)&g->sc[1];
-			while(i < nsects)
-			{
-				if((char *)&section[i] < g->ptr || (char*)&section[i] > g->end_ptr)
-					return(-1);
-				if(g->flag_d == 0 && ft_strncmp(section[i].sectname,"__text",6)==0 && ft_strncmp(section[i].segname,"__TEXT",6)==0)
-				{
-					char *add;
-					uint64_t off = section[i].addr;
-					uint8_t *c = (void*)g->ptr + section[i].offset;
-					int add_0 = 0;
-
-					uint32_t size = 1;
-					char *str;
-					ft_putstr(g->input);
-					ft_putstr(":\nContents of (__TEXT,__text) section\n");
-					add = unsigned_itoa_base(off, 16);
-					while(add_0 + ft_strlen(add) < 16)
-					{
-						ft_putstr("0");
-						add_0++;
-					}
-					ft_putstr(add);
-					ft_putstr("\t");
-					while(size <= section[i].size)
-					{
-						str = unsigned_itoa_base(c[size-1],16);
-						if(ft_strlen(str) == 1)
-							ft_putstr("0");
-						ft_putstr(str);
-						ft_putstr(" ");
-						if(size % 16 == 0 )
-						{
-							off += 16;
-							ft_putstr("\n");
-							add = unsigned_itoa_base(off, 16);
-							add_0 = 0;
-							while(add_0 + ft_strlen(add) < 16)
-							{
-								ft_putstr("0");
-								add_0++;
-							}
-							ft_putstr(add);
-							ft_putstr("\t");
-						}
-						size++;
-					}
-				}
-				else if(g->flag_d == 1 && ft_strncmp(section[i].sectname,"__data",6)==0 && ft_strncmp(section[i].segname,"__DATA",6)==0)
-				{
-					char *add;
-					uint64_t off = section[i].addr;
-					uint8_t *c = (void*)g->ptr + section[i].offset;
-					int add_0 = 0;
-
-					uint32_t size = 1;
-					char *str;
-					ft_putstr(g->input);
-					ft_putstr(":\nContents of (__DATA,__data) section\n");
-					add = unsigned_itoa_base(off, 16);
-					while(add_0 + ft_strlen(add) < 16)
-					{
-						ft_putstr("0");
-						add_0++;
-					}
-					ft_putstr(add);
-					ft_putstr("\t");
-					while(size <= section[i].size)
-					{
-						str = unsigned_itoa_base(c[size-1],16);
-						if(ft_strlen(str) == 1)
-							ft_putstr("0");
-						ft_putstr(str);
-						ft_putstr(" ");
-						if(size % 16 == 0 )
-						{
-							off += 16;
-							ft_putstr("\n");
-							add = unsigned_itoa_base(off, 16);
-							add_0 = 0;
-							while(add_0 + ft_strlen(add) < 16)
-							{
-								ft_putstr("0");
-								add_0++;
-							}
-							ft_putstr(add);
-							ft_putstr("\t");
-						}
-						size++;
-					}
-				}
-				i++;
-			}
-		}
+		g->sc = (struct segment_command_64 *)g->lc;
+		if (g->lc->cmd == LC_SEGMENT_64 && otools_64_trouver(&a, g) == -1)
+			return (-1);
 		if ((char*)g->lc + g->lc->cmdsize > g->end_ptr ||
 			(char*)g->lc + g->lc->cmdsize < g->ptr)
 			return (-1);
@@ -126,5 +115,5 @@ int			otools_64(t_gen *g)
 		g->i++;
 	}
 	ft_putstr("\n");
-	return(0);
+	return (0);
 }

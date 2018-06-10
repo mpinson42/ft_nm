@@ -34,7 +34,7 @@ static char	*init(int *i)
 	return (cmp);
 }
 
-static char *free_str(char *str)
+static char	*free_str(char *str)
 {
 	char *tmp;
 

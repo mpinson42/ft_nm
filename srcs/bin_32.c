@@ -1,208 +1,110 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bin_32.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mpinson <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/05/30 14:33:51 by mpinson           #+#    #+#             */
+/*   Updated: 2018/05/30 14:35:04 by mpinson          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "nm.h"
-
-static char	**ft_test_error(char *str, struct nlist *array,
-	int max, t_gen *g)
-{
-	int		i;
-	char	**val1;
-
-	i = -1;
-	if (!(val1 = malloc(sizeof(char *) * max + 1)))
-		return (NULL);
-	while (++i < max)
-	{
-		if (ft_secur_str(str + array[i].n_un.n_strx, g) == -1)
-			return (NULL);
-		val1[i] = str + array[i].n_un.n_strx;
-	}
-	return (val1);
-}
-
-char		**sort_name_32(struct nlist *array,
-	int max, char *str, t_gen *g)
-{
-	int		is_sort;
-	int		i;
-	char	**val1;
-	int		y;
-
-	if (!(val1 = ft_test_error(str, array, max, g)))
-		return (NULL);
-	is_sort = 1;
-	while (is_sort)
-	{
-		i = -1;
-		is_sort = 0;
-		while (++i + 1 < max)
-		{
-			y = 0;
-			while (val1[i][y] != 0 && val1[i][y] == val1[i + 1][y])
-				y++;
-			if (val1[i][y] > val1[i + 1][y])
-			{
-				is_sort = 1;
-				ft_swap(&val1[i + 1], &val1[i]);
-			}
-		}
-	}
-	return (val1);
-}
-
-char		**revers_sort_32(struct nlist *array,int max, char *str, t_gen *g)
-{
-	int		is_sort;
-	int		i;
-	char	**val1;
-	int		y;
-
-	if (!(val1 = ft_test_error(str, array, max, g)))
-		return (NULL);
-	is_sort = 1;
-	while (is_sort)
-	{
-		i = -1;
-		is_sort = 0;
-		while (++i + 1 < max)
-		{
-			y = 0;
-			while (val1[i][y] != 0 && val1[i][y] == val1[i + 1][y])
-				y++;
-			if (val1[i][y] < val1[i + 1][y])
-			{
-				is_sort = 1;
-				ft_swap(&val1[i + 1], &val1[i]);
-			}
-		}
-	}
-	return (val1);
-}
-
-char **deflault_sort_32(struct nlist *array,int max, char *str, t_gen *g)
-{
-	char	**val1;
-
-	if (!(val1 = ft_test_error(str, array, max, g)))
-		return (NULL);
-	return (val1);
-}
 
 int			print_output_32(int nsyms, int sysmoff, int stroff, t_gen *g)
 {
-	int				y;
 	char			*stringtable;
 	struct nlist	*array;
-	char			**str;
 
 	if (g->ptr + sysmoff > g->end_ptr || g->ptr + stroff > g->end_ptr ||
 		g->ptr + sysmoff < g->ptr || g->ptr + stroff < g->ptr)
 		return (-1);
 	array = (void *)g->ptr + sysmoff;
 	stringtable = (void *)g->ptr + stroff;
-	if(g->flag_p == 0 && g->flag_r == 0)
+	if (g->flag_p == 0 && g->flag_r == 0)
 	{
-		if (!(str = sort_name_32(array, nsyms, stringtable, g)))
+		if (!(g->str = sort_name_32(array, nsyms, stringtable, g)))
 			return (-1);
 	}
-	else if(g->flag_r == 1)
-	{
-		str = revers_sort_32(array, nsyms, stringtable, g);
-	}
+	else if (g->flag_r == 1)
+		g->str = revers_sort_32(array, nsyms, stringtable, g);
 	else
-		str = deflault_sort_32(array, nsyms, stringtable, g);
-	g->i = -1;
-	while (++g->i < nsyms)
-	{
-		y = -1;
-		while (++y < nsyms)
-		{
-			g->type = array[y].n_type;
-			g->sect = array[y].n_sect;
-			g->desc = array[y].n_desc;
-			g->is_32 = 1;
-			if (ft_strcmp(str[g->i], stringtable + array[y].n_un.n_strx) == 0)
-				print_nm(array[y].n_value, array[y].n_type,
-					stringtable + array[y].n_un.n_strx, g);
-		}
-	}
-	free(str);
+		g->str = deflault_sort_32(array, nsyms, stringtable, g);
+	mamange_sort_nm_32(g, nsyms, array, stringtable);
+	free(g->str);
 	return (0);
 }
 
-int			bin_32(t_gen *g)
+int			count_segment_32(t_gen *g, struct section **section,
+	uint32_t nsects, uint32_t *i)
 {
-	uint32_t nsects;
-	uint32_t i;
-	struct section *section_32;
 	g->header_32 = (struct mach_header *)g->ptr;
 	g->ncmds = g->header_32->ncmds;
 	g->i = 0;
 	if (g->ptr + sizeof(*g->header_32) > g->end_ptr ||
 		g->ptr + sizeof(*g->header_32) < g->ptr)
 		return (-1);
-
 	g->lc = (void*)g->ptr + sizeof(*g->header_32);
-
-
-	g->i = 0;
+	g->i = -1;
 	g->sc_32 = (struct segment_command *)g->lc;
-	i = 0;
-	while (g->i < g->ncmds)
+	i[0] = 0;
+	while (++g->i < g->ncmds)
 	{
 		if (g->lc->cmd == LC_SEGMENT)
 		{
 			g->sc_32 = (struct segment_command *)g->lc;
 			nsects = g->sc_32->nsects;
-
-
-			section_32 = (void*)&g->sc_32[1];
-			i += nsects;
+			section[0] = (void*)&g->sc_32[1];
+			i[0] += nsects;
 		}
 		if ((char*)g->lc + g->lc->cmdsize > g->end_ptr ||
 			(char*)g->lc + g->lc->cmdsize < g->ptr)
 			return (-1);
 		g->lc = (void *)g->lc + g->lc->cmdsize;
-		g->i++;
 	}
-	g->name_section = malloc(sizeof(char *) * (i + 1));
+	return (0);
+}
 
-	g->lc = (void*)g->ptr + sizeof(*g->header_32);
-	g->i = 0;
-	g->sc_32 = (struct segment_command *)g->lc;
-	int test = 0;
-	while (g->i < g->ncmds)
+int			save_segment_32(t_gen *g, uint32_t nsects, struct section *section)
+{
+	uint32_t	i;
+	int			test;
+
+	test = 0;
+	while (++g->i < g->ncmds)
 	{
 		if (g->lc->cmd == LC_SEGMENT)
 		{
 			g->sc_32 = (struct segment_command *)g->lc;
 			nsects = g->sc_32->nsects;
-
-			i = 0;
-			section_32 = (struct section*)&g->sc_32[1];
-			while(i < nsects)
+			i = -1;
+			section = (struct section*)&g->sc_32[1];
+			while (++i < nsects)
 			{
-				g->name_section[test] = section_32[i].sectname;
-				section_32 = (void*)section_32;
-				i++;
+				g->name_section[test] = section[i].sectname;
+				section = (void*)section;
 				test++;
 			}
-			
 		}
 		if ((char*)g->lc + g->lc->cmdsize > g->end_ptr ||
 			(char*)g->lc + g->lc->cmdsize < g->ptr)
 			return (-1);
 		g->lc = (void *)g->lc + g->lc->cmdsize;
-		g->i++;
 	}
+	return (0);
+}
 
-
-	g->i = 0;
+int			search_befor_print_32(t_gen *g)
+{
 	g->lc = (void*)g->ptr + sizeof(*g->header_32);
-	while (g->i < g->ncmds)
+	g->i = -1;
+	while (++g->i < g->ncmds)
 	{
 		if (g->lc->cmd == LC_SYMTAB)
 		{
 			g->sym = (struct symtab_command *)g->lc;
-			if(g->nb_input - g->count_flag != 2 && g->flag_o == 0)
+			if (g->nb_input != 1 && g->flag_o == 0)
 			{
 				ft_putstr("\n");
 				ft_putstr(g->input);
@@ -217,7 +119,26 @@ int			bin_32(t_gen *g)
 			(char*)g->lc + g->lc->cmdsize < g->ptr)
 			return (-1);
 		g->lc = (void *)g->lc + g->lc->cmdsize;
-		g->i++;
 	}
+	return (0);
+}
+
+int			bin_32(t_gen *g)
+{
+	uint32_t			i;
+	struct section		*section;
+	int					test;
+
+	test = 0;
+	if (count_segment_32(g, &section, 0, &i) == -1)
+		return (-1);
+	if (!(g->name_section = malloc(sizeof(char *) * (i + 1))))
+		return (-1);
+	g->lc = (void*)g->ptr + sizeof(*g->header_32);
+	g->i = -1;
+	g->sc_32 = (struct segment_command *)g->lc;
+	if (save_segment_32(g, 0, section) == -1)
+		return (-1);
+	search_befor_print_32(g);
 	return (0);
 }
