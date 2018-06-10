@@ -63,9 +63,10 @@ typedef	struct					s_algo
 	uint32_t					nsects;
 	uint32_t					i;
 	struct section				*section;
-	struct section				*section_64;
+	struct section_64			*section_64;
 	char						*add;
 	uint32_t					off;
+	uint64_t					off_64;
 	uint8_t						*c;
 	char						*str;
 	int							add_0;

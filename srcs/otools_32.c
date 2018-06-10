@@ -41,14 +41,17 @@ void	otools_32_printing2(t_algo *a)
 	}
 }
 
-void	otools_32_printing1(t_algo *a, t_gen *g)
+void	otools_32_printing1(t_algo *a, t_gen *g, int type)
 {
 	a->off = a->section[a->i].addr;
 	a->c = (void*)g->ptr + a->section[a->i].offset;
 	a->add_0 = 0;
 	a->size = 1;
 	ft_putstr(g->input);
-	ft_putstr(":\nContents of (__DATA,__data) section\n");
+	if (type == 2)
+		ft_putstr(":\nContents of (__DATA,__data) section\n");
+	else
+		ft_putstr(":\nContents of (__TEXT,__text) section\n");
 	a->add = unsigned_itoa_base(a->off, 16);
 	while (a->add_0 + ft_strlen(a->add) < 8)
 	{
@@ -74,14 +77,14 @@ int		otools_32_trouver(t_algo *a, t_gen *g)
 			"__text", 6) == 0 && ft_strncmp(
 			a->section[a->i].segname, "__TEXT", 6) == 0)
 		{
-			otools_32_printing1(a, g);
+			otools_32_printing1(a, g, 1);
 			otools_32_printing2(a);
 		}
 		else if (g->flag_d == 1 && ft_strncmp(a->section[a->i].sectname,
 			"__data", 6) == 0 && ft_strncmp(a->section[a->i].segname,
 			"__DATA", 6) == 0)
 		{
-			otools_32_printing1(a, g);
+			otools_32_printing1(a, g, 2);
 			otools_32_printing2(a);
 		}
 		a->i++;

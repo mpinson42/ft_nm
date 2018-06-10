@@ -110,9 +110,9 @@ void		print_nm(long long int add, int type, char *str, t_gen *g)
 	(void)type;
 	i = -1;
 	c = ft_char(g, add);
-	nb = unsigned_itoa_base(add, 16);
 	if (c == '-' || c == '?' || (g->flag_u == 1 && c != 'U'))
 		return ;
+	nb = unsigned_itoa_base(add, 16);
 	printing(g, nb, i, c);
 	ft_putstr(str);
 	ft_putchar('\n');

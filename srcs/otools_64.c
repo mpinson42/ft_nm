@@ -23,11 +23,11 @@ void	otools_64_printing2(t_algo *a)
 		ft_putstr(" ");
 		if (a->size % 16 == 0)
 		{
-			a->off += 16;
+			a->off_64 += 16;
 			ft_putstr("\n");
-			a->add = unsigned_itoa_base(a->off, 16);
+			a->add = unsigned_itoa_base(a->off_64, 16);
 			a->add_0 = 0;
-			while (a->add_0 + ft_strlen(a->add) < 8)
+			while (a->add_0 + ft_strlen(a->add) < 16)
 			{
 				ft_putstr("0");
 				a->add_0++;
@@ -41,16 +41,19 @@ void	otools_64_printing2(t_algo *a)
 	}
 }
 
-void	otools_64_printing1(t_algo *a, t_gen *g)
+void	otools_64_printing1(t_algo *a, t_gen *g, int type)
 {
-	a->off = a->section_64[a->i].addr;
+	a->off_64 = a->section_64[a->i].addr;
 	a->c = (void*)g->ptr + a->section_64[a->i].offset;
 	a->add_0 = 0;
 	a->size = 1;
 	ft_putstr(g->input);
-	ft_putstr(":\nContents of (__DATA,__data) section\n");
-	a->add = unsigned_itoa_base(a->off, 16);
-	while (a->add_0 + ft_strlen(a->add) < 8)
+	if (type == 2)
+		ft_putstr(":\nContents of (__DATA,__data) section\n");
+	else
+		ft_putstr(":\nContents of (__TEXT,__text) section\n");
+	a->add = unsigned_itoa_base(a->off_64, 16);
+	while (a->add_0 + ft_strlen(a->add) < 16)
 	{
 		ft_putstr("0");
 		a->add_0++;
@@ -64,7 +67,7 @@ int		otools_64_trouver(t_algo *a, t_gen *g)
 {
 	a->nsects = g->sc->nsects;
 	a->i = 0;
-	a->section_64 = (struct section*)&g->sc[1];
+	a->section_64 = (struct section_64*)&g->sc[1];
 	while (a->i < a->nsects)
 	{
 		if ((char *)&a->section_64[a->i] < g->ptr ||
@@ -74,14 +77,14 @@ int		otools_64_trouver(t_algo *a, t_gen *g)
 			"__text", 6) == 0 && ft_strncmp(
 			a->section_64[a->i].segname, "__TEXT", 6) == 0)
 		{
-			otools_64_printing1(a, g);
+			otools_64_printing1(a, g, 1);
 			otools_64_printing2(a);
 		}
 		else if (g->flag_d == 1 && ft_strncmp(a->section_64[a->i].sectname,
 			"__data", 6) == 0 && ft_strncmp(a->section_64[a->i].segname,
 			"__DATA", 6) == 0)
 		{
-			otools_64_printing1(a, g);
+			otools_64_printing1(a, g, 2);
 			otools_64_printing2(a);
 		}
 		a->i++;

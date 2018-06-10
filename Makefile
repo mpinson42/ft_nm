@@ -1,6 +1,6 @@
 NAME = ft_nm
 
-NAME2 = otool
+NAME2 = ft_otool
 
 SRC = srcs/main.c srcs/lib.c srcs/bin_32.c srcs/bin_64.c  srcs/fat_32.c srcs/print.c srcs/sort_64.c srcs/sort_32.c
 

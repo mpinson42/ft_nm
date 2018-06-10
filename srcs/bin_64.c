@@ -23,15 +23,15 @@ int			print_output(int nsyms, int sysmoff, int stroff, t_gen *g)
 	array = (void *)g->ptr + sysmoff;
 	stringtable = (void *)g->ptr + stroff;
 	if (g->flag_p == 0 && g->flag_r == 0)
-	{
-		if (!(g->str = sort_name(array, nsyms, stringtable, g)))
-			return (-1);
-	}
+		g->str = sort_name(array, nsyms, stringtable, g);
 	else if (g->flag_r == 1)
 		g->str = revers_sort(array, nsyms, stringtable, g);
 	else
 		g->str = deflault_sort(array, nsyms, stringtable, g);
+	if (g->str == NULL)
+		return (-1);
 	mamange_sort_nm_64(g, nsyms, array, stringtable);
+	free(g->also_down);
 	free(g->str);
 	return (0);
 }
@@ -141,5 +141,6 @@ int			bin_64(t_gen *g)
 	if (save_segment_64(g, 0, section) == -1)
 		return (-1);
 	search_befor_print(g);
+	free(g->name_section);
 	return (0);
 }
